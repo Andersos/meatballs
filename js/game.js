@@ -107,7 +107,7 @@ var update = function (modifier) {
 			meatball.infected = false;
 		} else{
 			meatball.infected = true;
-		};
+		}
 		// Throw the meatball somewhere on the screen randomly
 		meatball.x = 32 + (Math.random() * (canvas.width - 64));
 		meatball.y = 16 ;
