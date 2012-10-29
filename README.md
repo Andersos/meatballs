@@ -1,4 +1,9 @@
 Inspiration from https://github.com/alvincrespo/simple_canvas_game
+
+
+You can play the game here:
+
+[Link to game](http://www.andersos.net/projects/meatballs)
 -----
 
 * forking (or forks) hero
