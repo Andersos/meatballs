@@ -53,10 +53,6 @@ addEventListener("keyup", function (e) {
 var reset = function () {
 	hero.x = canvas.width / 2;
 	hero.y = canvas.height - 32;
-
-	// Throw the monster somewhere on the screen randomly
-	monster.x = 32 + (Math.random() * (canvas.width - 64));
-	monster.y = 16 ;
 };
 
 // Update game objects
@@ -85,7 +81,9 @@ var update = function (modifier) {
 		&& monster.y <= (hero.y + 32)
 	) {
 		++monstersCaught;
-		reset();
+		// Throw the monster somewhere on the screen randomly
+		monster.x = 32 + (Math.random() * (canvas.width - 64));
+		monster.y = 16 ;
 	}
 };
 
