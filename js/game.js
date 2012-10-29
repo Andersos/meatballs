@@ -66,6 +66,13 @@ var update = function (modifier) {
 		hero.x += hero.speed * modifier;
 	}
 
+	if (hero.x < 0) {
+		hero.x = canvas.height;
+	}
+	if (hero.x > canvas.height) {
+		hero.x = 0;
+	}
+
 	if (monster.y < canvas.height) {
 		monster.y += monster.speed * modifier;
 	} else{
