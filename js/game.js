@@ -13,30 +13,39 @@ bgImage.onload = function () {
 };
 bgImage.src = "images/background.png";
 
-// Hero image
-var heroReady = false;
-var heroImage = new Image();
-heroImage.onload = function () {
-	heroReady = true;
+// fork image
+var forkReady = false;
+var forkImage = new Image();
+forkImage.onload = function () {
+	forkReady = true;
 };
-heroImage.src = "images/hero.png";
+forkImage.src = "images/fork.png";
 
-// Monster image
-var monsterReady = false;
-var monsterImage = new Image();
-monsterImage.onload = function () {
-	monsterReady = true;
+// meatball image
+var meatballReady = false;
+var meatballImage = new Image();
+meatballImage.onload = function () {
+	meatballReady = true;
 };
-monsterImage.src = "images/monster.png";
+meatballImage.src = "images/meatball.png";
+
+// meatball infected image
+var meatballInfectedReady = false;
+var meatballInfectedImage = new Image();
+meatballInfectedImage.onload = function () {
+	meatballInfectedReady = true;
+};
+meatballInfectedImage.src = "images/meatball_green.png";
 
 // Game objects
-var hero = {
+var fork = {
 	speed: 256 // movement in pixels per second
 };
-var monster = {
-	speed: 128 // movement in pixels per second
+var meatball = {
+	speed: 128, // movement in pixels per second
+	infected: false
 };
-var monstersCaught = 0;
+var meatballsCaught = 0;
 
 // Handle keyboard controls
 var keysDown = {};
@@ -49,48 +58,59 @@ addEventListener("keyup", function (e) {
 	delete keysDown[e.keyCode];
 }, false);
 
-// Reset the game when the player catches a monster
+// Reset the game when the player catches a meatball
 var reset = function () {
-	hero.x = canvas.width / 2;
-	hero.y = canvas.height - 32;
+	fork.x = canvas.width / 2;
+	fork.y = canvas.height - 32;
 };
 
 // Update game objects
 var update = function (modifier) {
-	if (37 in keysDown) { 
+	if (37 in keysDown) {
 	// Player holding left
-		hero.x -= hero.speed * modifier;
+		fork.x -= fork.speed * modifier;
 	}
-	if (39 in keysDown) { 
+	if (39 in keysDown) {
 	// Player holding right
-		hero.x += hero.speed * modifier;
+		fork.x += fork.speed * modifier;
 	}
 
-	if (hero.x < 0) {
-		hero.x = canvas.height;
+	if (fork.x < 0) {
+		fork.x = canvas.height;
 	}
-	if (hero.x > canvas.height) {
-		hero.x = 0;
+	if (fork.x > canvas.height) {
+		fork.x = 0;
 	}
 
-	if (monster.y < canvas.height) {
-		monster.y += monster.speed * modifier;
+	if (meatball.y < canvas.height) {
+		meatball.y += meatball.speed * modifier;
 	} else{
-		monster.x = 32 + (Math.random() * (canvas.width - 64));
-		monster.y = 16;
-	};
+		meatball.x = 32 + (Math.random() * (canvas.width - 64));
+		meatball.y = 16;
+	}
 
-	// Are they touching?
+	// Scoring points
 	if (
-		hero.x <= (monster.x + 32)
-		&& monster.x <= (hero.x + 32)
-		&& hero.y <= (monster.y + 32)
-		&& monster.y <= (hero.y + 32)
+		fork.x <= (meatball.x + 32)
+		&& meatball.x <= (fork.x + 32)
+		&& fork.y <= (meatball.y + 32)
+		&& meatball.y <= (fork.y + 32)
 	) {
-		++monstersCaught;
-		// Throw the monster somewhere on the screen randomly
-		monster.x = 32 + (Math.random() * (canvas.width - 64));
-		monster.y = 16 ;
+		if (meatball.infected) {
+			meatballsCaught = 0;
+		} else{
+			++meatballsCaught;
+		}
+
+		// Make infected meatball 5% of the times
+		if (Math.random() > 0.10) {
+			meatball.infected = false;
+		} else{
+			meatball.infected = true;
+		};
+		// Throw the meatball somewhere on the screen randomly
+		meatball.x = 32 + (Math.random() * (canvas.width - 64));
+		meatball.y = 16 ;
 	}
 };
 
@@ -100,12 +120,17 @@ var render = function () {
 		ctx.drawImage(bgImage, 0, 0);
 	}
 
-	if (heroReady) {
-		ctx.drawImage(heroImage, hero.x, hero.y);
+	if (forkReady) {
+		ctx.drawImage(forkImage, fork.x, fork.y);
 	}
 
-	if (monsterReady) {
-		ctx.drawImage(monsterImage, monster.x, monster.y);
+	if (meatballReady && meatballInfectedReady) {
+		if (meatball.infected) {
+			ctx.drawImage(meatballInfectedImage, meatball.x, meatball.y);
+		} else{
+			ctx.drawImage(meatballImage, meatball.x, meatball.y);
+
+		}
 	}
 
 	// Score
@@ -113,7 +138,7 @@ var render = function () {
 	ctx.font = "24px Helvetica";
 	ctx.textAlign = "left";
 	ctx.textBaseline = "top";
-	ctx.fillText("Meatballs caught: " + monstersCaught, 32, 32);
+	ctx.fillText("Meatballs caught: " + meatballsCaught, 32, 32);
 };
 
 // The main game loop
