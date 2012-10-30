@@ -1,3 +1,6 @@
+// Settings
+var specialEventProbability = 0.50;
+
 // Create the canvas
 var canvas = document.createElement("canvas");
 var specialEvent = false;
@@ -60,7 +63,7 @@ var fork = {
 	infected: false
 };
 var meatball = {
-	speed: 128, // movement in pixels per second
+	speed: 512, // movement in pixels per second
 	infected: false,
 	healer: false
 };
@@ -116,6 +119,21 @@ var update = function (modifier) {
 	} else{
 		meatball.x = 32 + (Math.random() * (canvas.width - 64));
 		meatball.y = 16;
+		specialEvent = Math.random() > specialEventProbability;
+		if(fork.infected){
+			// Spawn red meatball
+			if (specialEvent) {
+				meatball.healer = false;
+			} else{
+				meatball.healer = true;
+			}
+		} else{
+			if (specialEvent) {
+				meatball.infected = false;
+			} else{
+				meatball.infected = true;
+		}
+		}
 	}
 
 	// Scoring points
@@ -127,16 +145,21 @@ var update = function (modifier) {
 	) {
 		if (meatball.infected) {
 			fork.infected = true;
+			--meatballsCaught;
 			meatball.infected = false;
-		} else if (meatball.healer && fork.infected){
-			fork.infected = false;
-			meatball.healer = false;
+		} else if (fork.infected){
+			if (meatball.healer) {
+				fork.infected = false;
+				meatball.healer = false;
+			} else{
+				--meatballsCaught;
+			}
 		} else {
 			++meatballsCaught;
 		}
 
 		// Make infected meatball 5% of the times
-		specialEvent = Math.random() > 0.50;
+		specialEvent = Math.random() > specialEventProbability;
 		if(fork.infected){
 			// Spawn red meatball
 			if (specialEvent) {
