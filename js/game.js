@@ -1,5 +1,5 @@
 // Settings
-var specialEventProbability = 0.50;
+var specialEventProbability = 0.10;
 
 // Create the canvas
 var canvas = document.createElement("canvas");
@@ -59,7 +59,7 @@ meatballHealerImage.src = "images/meatball_red.png";
 
 // Game objects
 var fork = {
-	speed: 256, // movement in pixels per second
+	speed: 768, // movement in pixels per second
 	infected: false
 };
 var meatball = {
@@ -80,6 +80,11 @@ addEventListener("keyup", function (e) {
 	delete keysDown[e.keyCode];
 }, false);
 
+addEventListener('touchmove', function (e) {
+	e.preventDefault();
+	fork.x = e.targetTouches[0].pageX;
+}, false);
+
 // Reset the game when the player catches a meatball
 var reset = function () {
 	fork.x = canvas.width / 2;
@@ -92,17 +97,17 @@ var update = function (modifier) {
 	// Player holding left
 	if (37 in keysDown) {
 		if (fork.infected) {
-			fork.x += fork.speed * modifier * (meatballsCaught +1);
+			fork.x += fork.speed * modifier;
 		} else{
-			fork.x -= fork.speed * modifier * (meatballsCaught +1);
+			fork.x -= fork.speed * modifier;
 		}
 	}
 	// Player holding right
 	if (39 in keysDown) {
 		if (fork.infected) {
-			fork.x -= fork.speed * modifier * (meatballsCaught +1);
+			fork.x -= fork.speed * modifier;
 		} else{
-			fork.x += fork.speed * modifier * (meatballsCaught +1);
+			fork.x += fork.speed * modifier;
 		}
 		
 	}
@@ -115,7 +120,7 @@ var update = function (modifier) {
 	}
 
 	if (meatball.y < canvas.height) {
-		meatball.y += meatball.speed * modifier * (meatballsCaught +1);
+		meatball.y += Math.min(meatball.speed*(meatballsCaught+1), 1024) * modifier;
 	} else{
 		meatball.x = 32 + (Math.random() * (canvas.width - 64));
 		meatball.y = 16;
