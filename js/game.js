@@ -1,5 +1,6 @@
 // Create the canvas
 var canvas = document.createElement("canvas");
+var specialEvent = false;
 var ctx = canvas.getContext("2d");
 canvas.width = 512;
 canvas.height = 480;
@@ -21,6 +22,14 @@ forkImage.onload = function () {
 };
 forkImage.src = "images/fork.png";
 
+// fork infected image
+var forkInfectedReady = false;
+var forkInfectedImage = new Image();
+forkInfectedImage.onload = function () {
+	forkInfectedReady = true;
+};
+forkInfectedImage.src = "images/fork_green.png";
+
 // meatball image
 var meatballReady = false;
 var meatballImage = new Image();
@@ -37,13 +46,23 @@ meatballInfectedImage.onload = function () {
 };
 meatballInfectedImage.src = "images/meatball_green.png";
 
+// meatball healer image
+var meatballHealerReady = false;
+var meatballHealerImage = new Image();
+meatballHealerImage.onload = function () {
+	meatballHealerReady = true;
+};
+meatballHealerImage.src = "images/meatball_red.png";
+
 // Game objects
 var fork = {
-	speed: 256 // movement in pixels per second
+	speed: 256, // movement in pixels per second
+	infected: false
 };
 var meatball = {
 	speed: 128, // movement in pixels per second
-	infected: false
+	infected: false,
+	healer: false
 };
 var meatballsCaught = 0;
 
@@ -66,13 +85,23 @@ var reset = function () {
 
 // Update game objects
 var update = function (modifier) {
-	if (37 in keysDown) {
+	render();
 	// Player holding left
-		fork.x -= fork.speed * modifier;
+	if (37 in keysDown) {
+		if (fork.infected) {
+			fork.x += fork.speed * modifier;
+		} else{
+			fork.x -= fork.speed * modifier;
+		}
 	}
-	if (39 in keysDown) {
 	// Player holding right
-		fork.x += fork.speed * modifier;
+	if (39 in keysDown) {
+		if (fork.infected) {
+			fork.x -= fork.speed * modifier;
+		} else{
+			fork.x += fork.speed * modifier;
+		}
+		
 	}
 
 	if (fork.x < 0) {
@@ -97,17 +126,32 @@ var update = function (modifier) {
 		&& meatball.y <= (fork.y + 32)
 	) {
 		if (meatball.infected) {
-			meatballsCaught = 0;
-		} else{
+			fork.infected = true;
+			meatball.infected = false;
+		} else if (meatball.healer && fork.infected){
+			fork.infected = false;
+			meatball.healer = false;
+		} else {
 			++meatballsCaught;
 		}
 
 		// Make infected meatball 5% of the times
-		if (Math.random() > 0.10) {
-			meatball.infected = false;
+		specialEvent = Math.random() > 0.50;
+		if(fork.infected){
+			// Spawn red meatball
+			if (specialEvent) {
+				meatball.healer = false;
+			} else{
+				meatball.healer = true;
+			}
 		} else{
-			meatball.infected = true;
+			if (specialEvent) {
+				meatball.infected = false;
+			} else{
+				meatball.infected = true;
 		}
+		}
+		
 		// Throw the meatball somewhere on the screen randomly
 		meatball.x = 32 + (Math.random() * (canvas.width - 64));
 		meatball.y = 16 ;
@@ -120,16 +164,22 @@ var render = function () {
 		ctx.drawImage(bgImage, 0, 0);
 	}
 
-	if (forkReady) {
-		ctx.drawImage(forkImage, fork.x, fork.y);
+	if (forkReady && forkInfectedReady) {
+		if (fork.infected) {
+			ctx.drawImage(forkInfectedImage, fork.x, fork.y);
+		} else{
+			ctx.drawImage(forkImage, fork.x, fork.y);
+
+		}
 	}
 
-	if (meatballReady && meatballInfectedReady) {
+	if (meatballReady && meatballInfectedReady && meatballHealerReady) {
 		if (meatball.infected) {
 			ctx.drawImage(meatballInfectedImage, meatball.x, meatball.y);
-		} else{
+		} else if (meatball.healer) {
+			ctx.drawImage(meatballHealerImage, meatball.x, meatball.y);
+		} else {
 			ctx.drawImage(meatballImage, meatball.x, meatball.y);
-
 		}
 	}
 
@@ -147,7 +197,6 @@ var main = function () {
 	var delta = now - then;
 
 	update(delta / 1000);
-	render();
 
 	then = now;
 };
