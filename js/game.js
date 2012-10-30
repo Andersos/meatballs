@@ -113,9 +113,9 @@ var update = function (modifier) {
 	}
 
 	if (fork.x < 0) {
-		fork.x = canvas.height;
+		fork.x = canvas.width;
 	}
-	if (fork.x > canvas.height) {
+	if (fork.x > canvas.width) {
 		fork.x = 0;
 	}
 
