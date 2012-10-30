@@ -5,8 +5,8 @@ var specialEventProbability = 0.10;
 var canvas = document.createElement("canvas");
 var specialEvent = false;
 var ctx = canvas.getContext("2d");
-canvas.width = 512;
-canvas.height = 480;
+canvas.width = Math.min(512, window.innerWidth);
+canvas.height = Math.min(480, window.innerHeight);
 document.body.appendChild(canvas);
 
 // Background image
@@ -120,7 +120,7 @@ var update = function (modifier) {
 	}
 
 	if (meatball.y < canvas.height) {
-		meatball.y += Math.min(meatball.speed*(meatballsCaught+1), 1024) * modifier;
+		meatball.y += Math.min(meatball.speed*(meatballsCaught+1), 512) * modifier;
 	} else{
 		meatball.x = 32 + (Math.random() * (canvas.width - 64));
 		meatball.y = 16;
