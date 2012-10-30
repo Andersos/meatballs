@@ -63,7 +63,7 @@ var fork = {
 	infected: false
 };
 var meatball = {
-	speed: 512, // movement in pixels per second
+	speed: 128, // movement in pixels per second
 	infected: false,
 	healer: false
 };
@@ -92,17 +92,17 @@ var update = function (modifier) {
 	// Player holding left
 	if (37 in keysDown) {
 		if (fork.infected) {
-			fork.x += fork.speed * modifier;
+			fork.x += fork.speed * modifier * (meatballsCaught +1);
 		} else{
-			fork.x -= fork.speed * modifier;
+			fork.x -= fork.speed * modifier * (meatballsCaught +1);
 		}
 	}
 	// Player holding right
 	if (39 in keysDown) {
 		if (fork.infected) {
-			fork.x -= fork.speed * modifier;
+			fork.x -= fork.speed * modifier * (meatballsCaught +1);
 		} else{
-			fork.x += fork.speed * modifier;
+			fork.x += fork.speed * modifier * (meatballsCaught +1);
 		}
 		
 	}
@@ -115,7 +115,7 @@ var update = function (modifier) {
 	}
 
 	if (meatball.y < canvas.height) {
-		meatball.y += meatball.speed * modifier;
+		meatball.y += meatball.speed * modifier * (meatballsCaught +1);
 	} else{
 		meatball.x = 32 + (Math.random() * (canvas.width - 64));
 		meatball.y = 16;
